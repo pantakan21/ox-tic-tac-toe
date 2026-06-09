@@ -8,8 +8,8 @@
 ## 1. Project Overview
 
 **ชื่อโปรเจกต์:** OX Game (Tic-tac-toe) Web Application  
-**วัตถุประสงค์:** Full Stack Developer Test ส่งให้ Extreme Co., Ltd. (niti.s@extreme.co.th)  
-**เป้าหมาย:** โชว์ทักษะตาม JD ครบทุก bullet และโชว์การใช้ AI อย่างถูกต้องตลอด SDLC
+**วัตถุประสงค์:** Full Stack Developer Test
+**เป้าหมาย:** Full Stack Developer Test — สร้างเกม Tic-tac-toe แบบ Human vs Bot
 
 ---
 
@@ -39,7 +39,6 @@
 
 ### Leaderboard / Admin Tool
 - หน้า leaderboard สาธารณะ แสดงคะแนนผู้เล่นทั้งหมด
-- (Optional) admin role ดู detail เพิ่มเติมได้
 
 ---
 
@@ -51,17 +50,17 @@
 - **Auth.js (NextAuth v5)** — OAuth 2.0 Google Provider
 
 ### Backend
-- **NestJS** — REST API + WebSocket (แยก service จาก Next frontend)
+- **NestJS** — REST API (แยก service จาก Next frontend)
 - **Prisma** ORM — เชื่อมต่อ MySQL
 - **Swagger** — API documentation (ใช้ NestJS built-in decorator)
 
 ### Database & Cache
 - **MySQL** — เก็บ User, Score, GameLog
-- **Redis** — cache leaderboard, เก็บ streak counter, rate-limiting
+- **Redis** — เก็บ streak counter (atomic), rate-limiting
 
 ### Infrastructure
 - **Docker Compose** — รัน app + mysql + redis ด้วย command เดียว
-- **npm** หรือ **yarn** package manager
+- **npm** package manager
 
 ---
 
@@ -71,12 +70,11 @@
 [Next.js Frontend]  ←→  [NestJS Backend API]  ←→  [MySQL]
       ↑                         ↑                      ↑
    Auth.js                  Redis Cache            Prisma ORM
-   (OAuth 2.0)           (leaderboard/streak)
+   (OAuth 2.0)              (streak only)
 ```
 
 **Pattern:** Modular Monolith ใน NestJS (feature-based modules)  
-**ทำไมไม่ full microservices:** scope ของ OX game ไม่ justify overhead — แต่ module boundary ชัดพร้อม scale  
-**README ต้องอธิบาย:** ถ้า scale จะแยก `game-service` / `score-service` อย่างไร
+**ทำไมไม่ full microservices:** scope ของ OX game ไม่ justify overhead — แต่ module boundary ชัดพร้อม scale
 
 ---
 
@@ -133,12 +131,11 @@ enum GameResult  { WIN LOSE DRAW }
 
 ### AI Coach (หลัก — ต้องทำ)
 - หลังจบเกม ส่ง `moves` sequence ให้ LLM วิเคราะห์
-- แสดง feedback เช่น "ตาที่ 3 พลาดโอกาสบล็อก"
-- **เรียก Anthropic API ฝั่ง server เท่านั้น** (NestJS service) ห้ามโชว์ API key ใน client
+- แสดง feedback ภาษาไทยสั้นๆ เช่น "ตาที่ 3 พลาดโอกาสบล็อก"
+- **เรียก Groq API (llama-3.3-70b-versatile) ฝั่ง server เท่านั้น** (NestJS service) ห้ามโชว์ API key ใน client
 
 ### Bot Personality (optional)
 - บอทแสดงความคิดเห็นระหว่างเกมผ่าน LLM
-- game logic ยังเป็น heuristic — LLM แค่ให้ "เสียง"
 
 ---
 
@@ -214,30 +211,30 @@ src/
 | DevOps | ร่าง Dockerfile, GitHub Actions | verify secret ไม่หลุด |
 | Docs | ร่าง README, API doc, comment | ตรวจความถูกต้อง |
 
-**จุดที่ AI ถูก override (ตัวอย่างสำหรับ presentation):**
-- AI เสนอ perfect minimax → เลือก heuristic bot เพราะ perfect play ทำให้ผู้เล่นชนะไม่ได้
-- AI เสนอ microservices ทุก module → เลือก modular monolith เพราะ scope ไม่ justify overhead
-
 ---
 
 ## 12. Environment Variables ที่ต้องมี
 
 ```env
-# Auth
-AUTH_SECRET=
+# Google OAuth
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
+# Auth
+JWT_SECRET=
+AUTH_SECRET=
+
+# AI Coach (server-side only)
+GROQ_API_KEY=
+
 # Database
-DATABASE_URL=mysql://...
+DATABASE_URL=mysql://ox_user:ox_password@localhost:3306/ox_game
 
 # Redis
-REDIS_URL=redis://...
-
-# AI (server-side only)
-ANTHROPIC_API_KEY=
+REDIS_URL=redis://localhost:6379
 
 # App
+PORT=3001
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
