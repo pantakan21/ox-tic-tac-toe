@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Cell } from './board-validator';
 
 interface Move {
@@ -12,12 +12,12 @@ interface Move {
 @Injectable()
 export class AiCoachService {
   private readonly logger = new Logger(AiCoachService.name);
-  private readonly client: Anthropic;
+  private readonly genAI: GoogleGenerativeAI;
 
   constructor(private readonly config: ConfigService) {
-    this.client = new Anthropic({
-      apiKey: this.config.getOrThrow<string>('ANTHROPIC_API_KEY'),
-    });
+    this.genAI = new GoogleGenerativeAI(
+      this.config.getOrThrow<string>('GEMINI_API_KEY'),
+    );
   }
 
   async analyze(moves: Move[], result: 'WIN' | 'LOSE' | 'DRAW'): Promise<string> {
@@ -28,13 +28,9 @@ export class AiCoachService {
     const resultText = { WIN: 'ผู้เล่นชนะ', LOSE: 'ผู้เล่นแพ้', DRAW: 'เสมอ' }[result];
 
     try {
-      const message = await this.client.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 512,
-        messages: [
-          {
-            role: 'user',
-            content: `คุณเป็น AI coach สำหรับเกม Tic-tac-toe วิเคราะห์เกมนี้เป็นภาษาไทย:
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
+
+      const prompt = `คุณเป็น AI coach สำหรับเกม Tic-tac-toe วิเคราะห์เกมนี้เป็นภาษาไทย:
 
 ผลลัพธ์: ${resultText}
 ผู้เล่นคือ X บอทคือ O
@@ -46,13 +42,10 @@ ${moveSummary}
 1. ตาที่น่าสนใจหรือพลาดโอกาสของผู้เล่น
 2. คำแนะนำสำหรับการเล่นครั้งต่อไป
 
-ตอบสั้นๆ ไม่เกิน 3-4 ประโยค`,
-          },
-        ],
-      });
+ตอบสั้นๆ ไม่เกิน 3-4 ประโยค`;
 
-      const block = message.content[0];
-      return block.type === 'text' ? block.text : 'ไม่สามารถวิเคราะห์ได้ในขณะนี้';
+      const result2 = await model.generateContent(prompt);
+      return result2.response.text();
     } catch (err) {
       this.logger.error('AI Coach error', err);
       return 'ไม่สามารถเชื่อมต่อ AI Coach ได้ในขณะนี้';

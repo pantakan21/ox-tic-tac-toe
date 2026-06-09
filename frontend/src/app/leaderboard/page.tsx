@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { api, type LeaderboardEntry } from '@/lib/api';
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 export default async function LeaderboardPage() {
   let entries: LeaderboardEntry[] = [];
