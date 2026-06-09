@@ -198,14 +198,12 @@ src/
 - [ ] Unit test ครอบ business logic (โดยเฉพาะ scoring/streak edge cases)
 - [ ] Swagger doc อัปเดต
 - [ ] ไม่มี secret หรือ API key ใน code
-- [ ] README อัปเดตถ้า setup เปลี่ยน
 
 ---
 
 ## 11. AI Workflow Across SDLC
 
 > โปรเจกต์นี้ใช้ AI ช่วยตลอด SDLC โดยมี human review ทุกขั้น
-> บันทึกไว้ใน `AI_USAGE.md`
 
 | เฟส | ใช้ AI ทำอะไร | Human ตรวจอะไร |
 |---|---|---|
@@ -222,18 +220,7 @@ src/
 
 ---
 
-## 12. Deliverables
-
-- [ ] Source code บน GitHub (public หรือ invite)
-- [ ] `README.md` — setup, env vars, architecture, design decisions
-- [ ] `AI_USAGE.md` — บันทึกการใช้ AI ตาม SDLC
-- [ ] `docker-compose.yml` — รัน full stack ด้วย command เดียว
-- [ ] Demo deploy (Vercel + Neon/Railway) พร้อมลิงก์
-- [ ] ส่ง repo URL ไปที่ niti.s@extreme.co.th
-
----
-
-## 13. Environment Variables ที่ต้องมี
+## 12. Environment Variables ที่ต้องมี
 
 ```env
 # Auth
