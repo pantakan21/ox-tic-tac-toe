@@ -4,6 +4,7 @@ import { BoardValidator, Board, Cell } from './board-validator';
 import { HeuristicBot } from './heuristic-bot';
 import { ScoreService } from '../score/score.service';
 import { AiCoachService } from './ai-coach.service';
+import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { EndGameDto } from './dto/move.dto';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class GameService {
     private readonly bot: HeuristicBot,
     private readonly scoreService: ScoreService,
     private readonly aiCoach: AiCoachService,
+    private readonly leaderboardService: LeaderboardService,
   ) {}
 
   getBotMove(board: Board): number {
@@ -35,6 +37,7 @@ export class GameService {
     ]);
 
     const scoreResult = await this.scoreService.applyResult(userId, result);
+    await this.leaderboardService.invalidateCache();
 
     return { gameLogId: gameLog.id, result, scoreChange: scoreResult };
   }

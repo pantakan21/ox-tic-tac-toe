@@ -8,7 +8,7 @@ import { Board, BoardValidator } from './board-validator';
  */
 @Injectable()
 export class HeuristicBot {
-  private static readonly MISTAKE_RATE = 0.2;
+  private static readonly MISTAKE_RATE = 0.8;
 
   constructor(private readonly validator: BoardValidator) {}
 

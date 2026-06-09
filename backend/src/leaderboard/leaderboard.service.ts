@@ -13,6 +13,10 @@ export class LeaderboardService {
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {}
 
+  async invalidateCache() {
+    await this.redis.del(LEADERBOARD_CACHE_KEY);
+  }
+
   async getTop50() {
     const cached = await this.redis.get(LEADERBOARD_CACHE_KEY);
     if (cached) return JSON.parse(cached) as unknown[];

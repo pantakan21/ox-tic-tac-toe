@@ -57,7 +57,10 @@ export default function GameBoard() {
     // Bot move
     setIsLoadingBot(true);
     try {
-      const { position } = await api.getBotMove(newBoard, index, token);
+      const [{ position }] = await Promise.all([
+        api.getBotMove(newBoard, index, token),
+        new Promise((r) => setTimeout(r, 600)),
+      ]);
       const botBoard = [...newBoard] as Cell[];
       botBoard[position] = 'O';
       const botMove = { player: 'O' as const, position, boardAfter: [...botBoard] };
@@ -90,7 +93,7 @@ export default function GameBoard() {
             disabled={!!cell || status !== 'playing' || isLoadingBot}
             className={`
               h-24 w-24 text-4xl font-bold rounded-lg border-2 transition-all
-              ${cell ? 'cursor-default' : 'cursor-pointer hover:bg-slate-100'}
+              ${cell || isLoadingBot ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-slate-100'}
               ${isWinCell ? 'bg-yellow-100 border-yellow-400' : 'bg-white border-slate-200'}
               ${cell === 'X' ? 'text-blue-600' : 'text-red-500'}
             `}

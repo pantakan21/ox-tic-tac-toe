@@ -1,6 +1,5 @@
 'use client';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface UserState {
   token: string | null;
@@ -10,15 +9,10 @@ interface UserState {
   clearToken: () => void;
 }
 
-export const useUserStore = create<UserState>()(
-  persist(
-    (set) => ({
-      token: null,
-      name: null,
-      image: null,
-      setToken: (token, name, image) => set({ token, name, image: image ?? null }),
-      clearToken: () => set({ token: null, name: null, image: null }),
-    }),
-    { name: 'ox-user' },
-  ),
-);
+export const useUserStore = create<UserState>()((set) => ({
+  token: null,
+  name: null,
+  image: null,
+  setToken: (token, name, image) => set({ token, name, image: image ?? null }),
+  clearToken: () => set({ token: null, name: null, image: null }),
+}));

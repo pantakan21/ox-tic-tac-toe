@@ -13,11 +13,22 @@ export default function GamePage() {
   const { status, setStatus, resetGame } = useGameStore();
   const [showCoach, setShowCoach] = useState(false);
   const [score, setScore] = useState<{ totalScore: number; currentStreak: number } | null>(null);
+  const [isUpdatingScore, setIsUpdatingScore] = useState(false);
 
   useEffect(() => {
     if (!token) { router.replace('/'); return; }
     api.getMyScore(token).then(setScore).catch(() => {});
-  }, [token, router, status]);
+  }, [token, router]);
+
+  useEffect(() => {
+    if (!token) return;
+    if (['win', 'lose', 'draw'].includes(status)) {
+      setIsUpdatingScore(true);
+      setTimeout(() => {
+        api.getMyScore(token).then(setScore).catch(() => {}).finally(() => setIsUpdatingScore(false));
+      }, 1000);
+    }
+  }, [status, token]);
 
   const startGame = () => {
     resetGame();
@@ -90,21 +101,24 @@ export default function GamePage() {
           <div className="flex gap-3">
             <button
               onClick={startGame}
-              className="flex-1 py-3 bg-blue-600 rounded-xl font-semibold hover:bg-blue-500"
+              disabled={isUpdatingScore}
+              className="flex-1 py-3 bg-blue-600 rounded-xl font-semibold hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               เล่นอีกครั้ง
             </button>
             <button
               onClick={() => setShowCoach(true)}
-              className="flex-1 py-3 bg-purple-600 rounded-xl font-semibold hover:bg-purple-500"
+              disabled={isUpdatingScore}
+              className="flex-1 py-3 bg-purple-600 rounded-xl font-semibold hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               🤖 AI Coach
             </button>
             <button
               onClick={() => router.push('/leaderboard')}
-              className="flex-1 py-3 bg-slate-600 rounded-xl font-semibold hover:bg-slate-500"
+              disabled={isUpdatingScore}
+              className="flex-1 py-3 bg-slate-600 rounded-xl font-semibold hover:bg-slate-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              Leaderboard
+              {isUpdatingScore ? 'กำลังอัปเดต...' : 'Leaderboard'}
             </button>
           </div>
         )}

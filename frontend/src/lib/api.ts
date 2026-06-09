@@ -66,7 +66,7 @@ export const api = {
     request<ScoreData>('/score/me', {}, token),
 
   getLeaderboard: () =>
-    request<LeaderboardEntry[]>('/leaderboard'),
+    request<LeaderboardEntry[]>('/leaderboard', { cache: 'no-store' }),
 
   getHistory: (token: string) =>
     request<{ id: string; result: string; createdAt: string }[]>('/game/history', {}, token),

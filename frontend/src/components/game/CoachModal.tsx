@@ -29,19 +29,22 @@ export default function CoachModal({ onClose }: { onClose: () => void }) {
           <button
             onClick={requestCoach}
             disabled={isLoadingCoach}
-            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {isLoadingCoach ? 'กำลังวิเคราะห์...' : 'ขอคำแนะนำจาก AI'}
           </button>
         )}
 
         {coachFeedback && (
-          <p className="text-gray-700 leading-relaxed mt-2">{coachFeedback}</p>
+          <div
+            className="text-gray-700 leading-relaxed mt-2 [&>p]:mb-2"
+            dangerouslySetInnerHTML={{ __html: coachFeedback }}
+          />
         )}
 
         <button
           onClick={onClose}
-          className="mt-4 w-full py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+          className="mt-4 w-full py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 cursor-pointer"
         >
           ปิด
         </button>
