@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  image     String?
+  role      Role      @default(PLAYER)
+  score     Score?
+  gameLogs  GameLog[]
+  createdAt DateTime  @default(now())
+}
+
+model Score {
+  id            String @id @default(cuid())
+  userId        String @unique
+  user          User   @relation(fields: [userId], references: [id])
+  totalScore    Int    @default(0)
+  currentStreak Int    @default(0)
+  wins          Int    @default(0)
+  losses        Int    @default(0)
+  draws         Int    @default(0)
+}
+
+model GameLog {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  result    GameResult
+  moves     Json
+  createdAt DateTime   @default(now())
+}
+
+enum Role {
+  PLAYER
+  ADMIN
+}
+
+enum GameResult {
+  WIN
+  LOSE
+  DRAW
+}
