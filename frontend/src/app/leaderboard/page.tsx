@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { api, type LeaderboardEntry } from '@/lib/api';
+import { BackButton } from './back-button';
 
 export const revalidate = 0;
 
@@ -15,7 +15,7 @@ export default async function LeaderboardPage() {
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">🏆 Leaderboard</h1>
-          <Link href="/game" className="text-slate-300 hover:text-white text-sm">← กลับเล่นเกม</Link>
+          <BackButton />
         </div>
 
         <div className="bg-white/5 rounded-2xl overflow-hidden">
