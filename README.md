@@ -8,19 +8,31 @@ Human vs AI Tic-tac-toe with Google OAuth, score/streak tracking, leaderboard, a
 
 ## Quick Start
 
-ต้องมี **Docker Desktop** และไฟล์ `backend/.env` (ได้รับแยกต่างหาก)
+ต้องมี **Docker Desktop** + **Node.js 20+** และไฟล์ `backend/.env` (ได้รับแยกต่างหาก)
 
 ```bash
 git clone <repo-url>
 cd ox-tic-tac-toe
-# วาง .env ที่ได้รับใน backend/.env
-docker compose up --build
-# เปิด terminal ใหม่ รันครั้งแรกเท่านั้น:
-docker compose exec backend npx prisma migrate deploy
+
+# 1. รัน MySQL + Redis ด้วย Docker
+docker compose up -d
+
+# 2. Backend (วาง .env ที่ได้รับใน backend/.env ก่อน)
+cd backend
+npm install
+npx prisma migrate deploy     # สร้างตาราง (ครั้งแรกเท่านั้น)
+npm run start:dev
+
+# 3. Frontend (เปิด terminal ใหม่)
+cd frontend
+npm install
+npm run dev
 ```
 
 - เกม: http://localhost:3000
 - Swagger: http://localhost:3001/api/docs
+
+> Docker รันเฉพาะ MySQL + Redis ส่วนแอปรันด้วย npm เพื่อ dev ที่เร็วและ debug ง่าย
 
 ---
 
@@ -28,10 +40,11 @@ docker compose exec backend npx prisma migrate deploy
 
 | Layer | เทคโนโลยี |
 |---|---|
-| Frontend | Next.js 15, React, TypeScript, Zustand, Auth.js, Tailwind |
+| Frontend | Next.js 16, React 19, TypeScript, Zustand, Tailwind |
 | Backend | NestJS, Prisma, MySQL 8, Redis 7 |
+| Auth | Google OAuth 2.0 (Passport) + JWT |
 | AI Coach | Groq API (llama-3.3-70b-versatile) |
-| Infra | Docker Compose, Jest |
+| Infra | Docker (MySQL/Redis), Jest |
 
 ---
 
@@ -67,6 +80,18 @@ Modular Monolith: `auth/` `game/` `score/` `leaderboard/`
 - **Redis Lua script สำหรับ streak** — ต้องการ atomicity ป้องกัน race condition
 - **JWT in-memory เท่านั้น** — ไม่ persist localStorage เพื่อความปลอดภัย
 - **AI Coach server-side** — Groq API key ไม่เคยออกจาก backend
+
+---
+
+## Security
+
+- **Score** คำนวณฝั่ง server เท่านั้น + ตรวจ board state ก่อนบันทึก
+- **Streak** ใช้ Redis Lua script (atomic) ป้องกัน race condition
+- **AI Coach** เรียก Groq ฝั่ง server — API key ไม่ออกจาก backend
+- **Rate limit** 10 req/min บน `/game/end`
+
+> **Known trade-off:** server ตรวจ board เชิงโครงสร้าง แต่ยังไม่ replay `moves`
+> การปิดโกงสมบูรณ์ต้องทำ server-authoritative game state (เกินขอบเขต test นี้)
 
 ---
 

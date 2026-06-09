@@ -17,7 +17,7 @@
 
 ### Authentication
 - ผู้เล่น **ต้อง login ก่อน** เล่นเกม
-- ใช้ **OAuth 2.0** มาตรฐาน ผ่าน Auth.js (NextAuth) + Google Provider
+- ใช้ **OAuth 2.0** มาตรฐาน ผ่าน Passport (Google Strategy) ฝั่ง NestJS + JWT
 - ไม่ต้องสร้าง user management เอง
 
 ### Game Rules
@@ -47,7 +47,7 @@
 ### Frontend
 - **Next.js** (App Router) + **React** — TypeScript strict
 - **Zustand** — game state management (กระดาน, turn, score ชั่วคราว)
-- **Auth.js (NextAuth v5)** — OAuth 2.0 Google Provider
+- **JWT (jwt-decode)** — เก็บ token จาก backend ใน Zustand
 
 ### Backend
 - **NestJS** — REST API (แยก service จาก Next frontend)
@@ -56,7 +56,7 @@
 
 ### Database & Cache
 - **MySQL** — เก็บ User, Score, GameLog
-- **Redis** — เก็บ streak counter (atomic), rate-limiting
+- **Redis** — เก็บ streak counter (atomic Lua script)
 
 ### Infrastructure
 - **Docker Compose** — รัน app + mysql + redis ด้วย command เดียว
@@ -69,7 +69,7 @@
 ```
 [Next.js Frontend]  ←→  [NestJS Backend API]  ←→  [MySQL]
       ↑                         ↑                      ↑
-   Auth.js                  Redis Cache            Prisma ORM
+   JWT (Passport)           Redis                  Prisma ORM
    (OAuth 2.0)              (streak only)
 ```
 
@@ -149,7 +149,7 @@ enum GameResult  { WIN LOSE DRAW }
 | CSRF | NestJS CSRF guard บน state-changing endpoint |
 | Score Manipulation | ตรวจ board state ฝั่ง server ก่อนบันทึกคะแนน |
 | API Key Exposure | เก็บใน `.env` เท่านั้น ห้าม commit |
-| Rate Limiting | Redis-based rate limit บน `/game/end` endpoint |
+| Rate Limiting | NestJS Throttler (in-memory) บน `/game/end` — 10 req/min |
 
 ---
 

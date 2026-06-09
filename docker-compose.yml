@@ -1,5 +1,8 @@
 version: "3.9"
 
+# รัน infrastructure (MySQL + Redis) สำหรับ local development
+# แอป (backend/frontend) รันด้วย npm — ดู README
+
 services:
   mysql:
     image: mysql:8.0
@@ -31,43 +34,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: ox_backend
-    ports:
-      - "3001:3001"
-    environment:
-      DATABASE_URL: mysql://ox_user:ox_password@mysql:3306/ox_game
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      PORT: 3001
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: ox_frontend
-    ports:
-      - "3000:3000"
-    environment:
-      NEXTAUTH_URL: http://localhost:3000
-      AUTH_SECRET: ${AUTH_SECRET}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      NEXT_PUBLIC_API_URL: http://localhost:3001
-    depends_on:
-      - backend
 
 volumes:
   mysql_data:

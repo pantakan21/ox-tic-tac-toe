@@ -25,6 +25,9 @@ export class GameService {
 
   async endGame(userId: string, dto: EndGameDto) {
     const board = dto.board as Board;
+    // ตรวจ board เชิงโครงสร้าง (จำนวน X/O, ห้ามมี 2 ผู้ชนะ) ก่อนบันทึกคะแนน
+    // Trade-off: ยังไม่ได้ replay `moves` เทียบ board — การปิดโกงสมบูรณ์ต้องให้
+    // server ถือ game state เอง (server-authoritative) ซึ่งเกินขอบเขตของ test นี้
     this.validator.validate(board);
 
     const result = this.validator.getResult(board);
