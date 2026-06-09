@@ -61,7 +61,7 @@ export default function GamePage() {
             )}
             <button
               onClick={() => { clearToken(); router.replace('/'); }}
-              className="text-xs text-slate-400 hover:text-white mt-1"
+              className="text-xs text-slate-400 hover:text-white mt-1 cursor-pointer"
             >
               ออกจากระบบ
             </button>
@@ -86,7 +86,7 @@ export default function GamePage() {
               <p className="text-slate-300 mb-4">พร้อมเล่นเกม Tic-tac-toe กับบอท AI?</p>
               <button
                 onClick={startGame}
-                className="px-8 py-3 bg-blue-600 rounded-xl text-lg font-semibold hover:bg-blue-500 transition"
+                className="px-8 py-3 bg-blue-600 rounded-xl text-lg font-semibold hover:bg-blue-500 transition cursor-pointer"
               >
                 เริ่มเกม
               </button>

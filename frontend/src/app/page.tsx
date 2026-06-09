@@ -6,10 +6,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-700 flex items-center justify-center text-white">
       <div className="text-center max-w-md px-6">
-        <div className="text-8xl mb-6">❌⭕</div>
-        <h1 className="text-5xl font-bold mb-3">OX Game</h1>
+        <div className="text-8xl mb-6">⭕❌</div>
         <p className="text-slate-300 text-lg mb-10">
-          เล่น Tic-tac-toe กับ AI บอท — มี AI Coach วิเคราะห์เกมหลังจบ
+          เล่น Tic-tac-toe กับบอท
         </p>
 
         <a
