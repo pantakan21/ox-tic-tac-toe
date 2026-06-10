@@ -19,7 +19,7 @@ export class GameController {
   @ApiResponse({ status: 200, description: 'Bot move position (0-8)' })
   @ApiResponse({ status: 400, description: 'Invalid board state' })
   getBotMove(@Body() dto: MakeMoveDto) {
-    const position = this.gameService.getBotMove(dto.board as ('X' | 'O' | null)[]);
+    const position = this.gameService.getBotMove(dto.board as ('X' | 'O' | null)[], dto.difficulty);
     return { position };
   }
 

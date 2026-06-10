@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { Board, BoardValidator } from './board-validator';
 
-/**
- * Heuristic bot — smart but beatable.
- * Priority: win > block > center > corner > random
- * 80% of the time picks a random empty cell (intentional) so the human can win.
- * Only the remaining 20% uses the strategy above.
- */
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
+// Probability of making a random (non-strategic) move per difficulty
+const MISTAKE_RATE: Record<Difficulty, number> = {
+  easy: 0.95,
+  medium: 0.6,
+  hard: 0.1,
+};
+
 @Injectable()
 export class HeuristicBot {
-  private static readonly MISTAKE_RATE = 0.8;
-
   constructor(private readonly validator: BoardValidator) {}
 
-  getMove(board: Board): number {
+  getMove(board: Board, difficulty: Difficulty = 'medium'): number {
     const empty = board.map((c, i) => (c === null ? i : -1)).filter((i) => i !== -1);
     if (empty.length === 0) throw new Error('No moves available');
 
-    // Introduce random mistakes to keep game winnable
-    if (Math.random() < HeuristicBot.MISTAKE_RATE) {
+    if (Math.random() < MISTAKE_RATE[difficulty]) {
       return empty[Math.floor(Math.random() * empty.length)];
     }
 

@@ -16,9 +16,9 @@ export class GameService {
     private readonly aiCoach: AiCoachService,
   ) {}
 
-  getBotMove(board: Board): number {
+  getBotMove(board: Board, difficulty: import('./heuristic-bot').Difficulty = 'medium'): number {
     this.validator.validate(board);
-    return this.bot.getMove(board);
+    return this.bot.getMove(board, difficulty);
   }
 
   async endGame(userId: string, dto: EndGameDto) {
@@ -31,9 +31,12 @@ export class GameService {
     const result = this.validator.getResult(board);
     if (!result) throw new BadRequestException('Game is not finished yet');
 
+    const difficultyMap = { easy: 'EASY', medium: 'MEDIUM', hard: 'HARD' } as const;
+    const difficulty = difficultyMap[dto.difficulty ?? 'medium'];
+
     const [gameLog] = await Promise.all([
       this.prisma.gameLog.create({
-        data: { userId, result, moves: dto.moves as object[] },
+        data: { userId, result, difficulty, moves: dto.moves as object[] },
       }),
     ]);
 

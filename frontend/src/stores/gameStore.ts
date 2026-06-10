@@ -3,6 +3,7 @@ import { create } from 'zustand';
 
 export type Cell = 'X' | 'O' | null;
 export type GameStatus = 'idle' | 'playing' | 'win' | 'lose' | 'draw';
+export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export interface MoveRecord {
   player: 'X' | 'O';
@@ -18,6 +19,7 @@ interface GameState {
   coachFeedback: string | null;
   isLoadingBot: boolean;
   isLoadingCoach: boolean;
+  difficulty: Difficulty;
 
   setBoard: (board: Cell[]) => void;
   setStatus: (status: GameStatus) => void;
@@ -26,6 +28,7 @@ interface GameState {
   setCoachFeedback: (feedback: string) => void;
   setIsLoadingBot: (loading: boolean) => void;
   setIsLoadingCoach: (loading: boolean) => void;
+  setDifficulty: (difficulty: Difficulty) => void;
   resetGame: () => void;
 }
 
@@ -39,6 +42,7 @@ export const useGameStore = create<GameState>((set) => ({
   coachFeedback: null,
   isLoadingBot: false,
   isLoadingCoach: false,
+  difficulty: 'medium',
 
   setBoard: (board) => set({ board }),
   setStatus: (status) => set({ status }),
@@ -47,6 +51,7 @@ export const useGameStore = create<GameState>((set) => ({
   setCoachFeedback: (feedback) => set({ coachFeedback: feedback }),
   setIsLoadingBot: (isLoadingBot) => set({ isLoadingBot }),
   setIsLoadingCoach: (isLoadingCoach) => set({ isLoadingCoach }),
+  setDifficulty: (difficulty) => set({ difficulty }),
   resetGame: () =>
     set({ board: initialBoard, status: 'idle', moves: [], lastGameLogId: null, coachFeedback: null }),
 }));

@@ -1,5 +1,6 @@
-import { IsArray, IsInt, IsString, Max, Min, ArrayMinSize, ArrayMaxSize } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsInt, IsString, IsOptional, IsIn, Max, Min, ArrayMinSize, ArrayMaxSize } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import type { Difficulty } from '../heuristic-bot';
 
 export class MakeMoveDto {
   @ApiProperty({ description: 'Current board state (9 cells: X | O | null)', example: ['X', null, null, null, null, null, null, null, null] })
@@ -13,6 +14,11 @@ export class MakeMoveDto {
   @Min(0)
   @Max(8)
   position: number;
+
+  @ApiPropertyOptional({ description: 'Bot difficulty', enum: ['easy', 'medium', 'hard'], default: 'medium' })
+  @IsOptional()
+  @IsIn(['easy', 'medium', 'hard'])
+  difficulty?: Difficulty;
 }
 
 export class EndGameDto {
@@ -25,6 +31,11 @@ export class EndGameDto {
   @ApiProperty({ description: 'All moves in order' })
   @IsArray()
   moves: unknown[];
+
+  @ApiPropertyOptional({ description: 'Bot difficulty used in this game', enum: ['easy', 'medium', 'hard'], default: 'medium' })
+  @IsOptional()
+  @IsIn(['easy', 'medium', 'hard'])
+  difficulty?: 'easy' | 'medium' | 'hard';
 }
 
 export class CoachRequestDto {

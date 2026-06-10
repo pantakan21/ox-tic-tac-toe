@@ -24,7 +24,16 @@
 - ผู้เล่น (Human) vs บอท (AI)
 - กติกา Tic-tac-toe ปกติ (3x3, 3 แถวชนะ)
 - **บอทต้องแพ้ได้** — ห้ามใช้ perfect minimax เพราะผู้เล่นจะชนะไม่ได้เลย
-  - แนะนำ: heuristic bot ที่ฉลาดแต่มีโอกาสผิดพลาด หรือ difficulty ให้เลือก
+- ผู้เล่น **เลือก Bot Difficulty** ก่อนเริ่มเกมได้ 3 ระดับ:
+
+| Difficulty | พฤติกรรมบอท |
+|---|---|
+| Easy | สุ่มเดินเกือบทั้งหมด มีโอกาสบล็อกต่ำ ผู้เล่นชนะได้ง่าย |
+| Medium | heuristic bot — บล็อกและโจมตีได้บ้าง แต่มีโอกาสพลาด |
+| Hard | heuristic bot เต็มรูปแบบ — บล็อกและโจมตีเสมอ แต่ไม่ใช่ perfect minimax |
+
+- Difficulty ส่งมาจาก client ใน request body — **server ต้องรับ `difficulty` field และปรับ bot logic ตาม**
+- ค่า default คือ `Medium` ถ้าไม่ส่งมา
 
 ### Scoring System
 | ผลลัพธ์ | คะแนน |

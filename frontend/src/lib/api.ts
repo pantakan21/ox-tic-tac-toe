@@ -44,16 +44,16 @@ export interface EndGameResponse {
 }
 
 export const api = {
-  getBotMove: (board: (string | null)[], position: number, token: string) =>
+  getBotMove: (board: (string | null)[], position: number, token: string, difficulty: 'easy' | 'medium' | 'hard' = 'medium') =>
     request<BotMoveResponse>('/game/bot-move', {
       method: 'POST',
-      body: JSON.stringify({ board, position }),
+      body: JSON.stringify({ board, position, difficulty }),
     }, token),
 
-  endGame: (board: (string | null)[], moves: unknown[], token: string) =>
+  endGame: (board: (string | null)[], moves: unknown[], token: string, difficulty: 'easy' | 'medium' | 'hard' = 'medium') =>
     request<EndGameResponse>('/game/end', {
       method: 'POST',
-      body: JSON.stringify({ board, moves }),
+      body: JSON.stringify({ board, moves, difficulty }),
     }, token),
 
   getCoach: (gameLogId: string, token: string) =>
@@ -65,8 +65,8 @@ export const api = {
   getMyScore: (token: string) =>
     request<ScoreData>('/score/me', {}, token),
 
-  getLeaderboard: () =>
-    request<LeaderboardEntry[]>('/leaderboard', { cache: 'no-store' }),
+  getLeaderboard: (difficulty?: 'easy' | 'medium' | 'hard') =>
+    request<LeaderboardEntry[]>(`/leaderboard${difficulty ? `?difficulty=${difficulty}` : ''}`, { cache: 'no-store' }),
 
   getHistory: (token: string) =>
     request<{ id: string; result: string; createdAt: string }[]>('/game/history', {}, token),

@@ -19,7 +19,7 @@ function getWinLine(board: Cell[]): number[] | null {
 }
 
 export default function GameBoard() {
-  const { board, status, moves, isLoadingBot, setBoard, setStatus, addMove, setLastGameLogId, setIsLoadingBot } = useGameStore();
+  const { board, status, moves, isLoadingBot, difficulty, setBoard, setStatus, addMove, setLastGameLogId, setIsLoadingBot } = useGameStore();
   const { token } = useUserStore();
   const [botError, setBotError] = useState<string | null>(null);
 
@@ -41,7 +41,7 @@ export default function GameBoard() {
       setStatus('win');
       const allMoves = [...moves, humanMove];
       try {
-        const res = await api.endGame(newBoard, allMoves, token);
+        const res = await api.endGame(newBoard, allMoves, token, difficulty);
         setLastGameLogId(res.gameLogId);
       } catch {}
       return;
@@ -50,7 +50,7 @@ export default function GameBoard() {
       setStatus('draw');
       const allMoves = [...moves, humanMove];
       try {
-        const res = await api.endGame(newBoard, allMoves, token);
+        const res = await api.endGame(newBoard, allMoves, token, difficulty);
         setLastGameLogId(res.gameLogId);
       } catch {}
       return;
@@ -60,7 +60,7 @@ export default function GameBoard() {
     setIsLoadingBot(true);
     try {
       const [botRes] = await Promise.all([
-        api.getBotMove(newBoard, index, token).catch((err: Error) => {
+        api.getBotMove(newBoard, index, token, difficulty).catch((err: Error) => {
           setBotError(err.message ?? 'บอทตอบสนองไม่ได้ กรุณาลองใหม่');
           throw err;
         }),
@@ -76,17 +76,17 @@ export default function GameBoard() {
       const allMoves = [...moves, humanMove, botMove];
       if (getWinLine(botBoard)) {
         setStatus('lose');
-        const res = await api.endGame(botBoard, allMoves, token);
+        const res = await api.endGame(botBoard, allMoves, token, difficulty);
         setLastGameLogId(res.gameLogId);
       } else if (botBoard.every(Boolean)) {
         setStatus('draw');
-        const res = await api.endGame(botBoard, allMoves, token);
+        const res = await api.endGame(botBoard, allMoves, token, difficulty);
         setLastGameLogId(res.gameLogId);
       }
     } finally {
       setIsLoadingBot(false);
     }
-  }, [board, status, moves, token, isLoadingBot, addMove, setBoard, setStatus, setLastGameLogId, setIsLoadingBot]);
+  }, [board, status, moves, token, isLoadingBot, difficulty, addMove, setBoard, setStatus, setLastGameLogId, setIsLoadingBot]);
 
   return (
     <div>
