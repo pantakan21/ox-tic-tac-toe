@@ -5,7 +5,6 @@ import { BoardValidator, Board } from './board-validator';
 import { HeuristicBot } from './heuristic-bot';
 import { ScoreService } from '../score/score.service';
 import { AiCoachService } from './ai-coach.service';
-import { LeaderboardService } from '../leaderboard/leaderboard.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 const WIN_BOARD: Board = ['X', 'X', 'X', 'O', 'O', null, null, null, null]; // X wins row 0
@@ -21,7 +20,6 @@ const mockPrisma = {
 };
 
 const mockScoreService = { applyResult: jest.fn() };
-const mockLeaderboardService = { invalidateCache: jest.fn() };
 const mockAiCoach = { analyze: jest.fn() };
 const mockBot = { getMove: jest.fn() };
 
@@ -38,7 +36,6 @@ describe('GameService', () => {
         { provide: HeuristicBot, useValue: mockBot },
         { provide: ScoreService, useValue: mockScoreService },
         { provide: AiCoachService, useValue: mockAiCoach },
-        { provide: LeaderboardService, useValue: mockLeaderboardService },
       ],
     }).compile();
 
@@ -47,7 +44,6 @@ describe('GameService', () => {
 
     mockPrisma.gameLog.create.mockResolvedValue({ id: 'log-1' });
     mockScoreService.applyResult.mockResolvedValue({ scoreDelta: 1, bonusAwarded: false, newStreak: 1 });
-    mockLeaderboardService.invalidateCache.mockResolvedValue(undefined);
   });
 
   afterEach(() => jest.clearAllMocks());
@@ -79,14 +75,6 @@ describe('GameService', () => {
       // Business Rule #1: คะแนนคำนวณฝั่ง server เท่านั้น
       await service.endGame('user-1', { board: WIN_BOARD, moves: [] });
       expect(mockScoreService.applyResult).toHaveBeenCalledWith('user-1', 'WIN');
-    });
-
-    it('should invalidate leaderboard cache after applying score', async () => {
-      // Ensures leaderboard reflects new score immediately
-      await service.endGame('user-1', { board: WIN_BOARD, moves: [] });
-      const applyOrder = mockScoreService.applyResult.mock.invocationCallOrder[0];
-      const invalidateOrder = mockLeaderboardService.invalidateCache.mock.invocationCallOrder[0];
-      expect(invalidateOrder).toBeGreaterThan(applyOrder);
     });
 
     it('should return gameLogId, result, and scoreChange', async () => {

@@ -4,7 +4,8 @@ import { Board, BoardValidator } from './board-validator';
 /**
  * Heuristic bot — smart but beatable.
  * Priority: win > block > center > corner > random
- * Introduces intentional mistakes (~20% chance) to keep the game winnable.
+ * 80% of the time picks a random empty cell (intentional) so the human can win.
+ * Only the remaining 20% uses the strategy above.
  */
 @Injectable()
 export class HeuristicBot {

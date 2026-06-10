@@ -1,5 +1,5 @@
 'use client';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useGameStore, type Cell } from '@/stores/gameStore';
 import { useUserStore } from '@/stores/userStore';
 import { api } from '@/lib/api';
@@ -21,11 +21,13 @@ function getWinLine(board: Cell[]): number[] | null {
 export default function GameBoard() {
   const { board, status, moves, isLoadingBot, setBoard, setStatus, addMove, setLastGameLogId, setIsLoadingBot } = useGameStore();
   const { token } = useUserStore();
+  const [botError, setBotError] = useState<string | null>(null);
 
   const winLine = getWinLine(board);
 
   const handleCellClick = useCallback(async (index: number) => {
     if (!token || board[index] || status !== 'playing' || isLoadingBot) return;
+    setBotError(null);
 
     // Human move (X)
     const newBoard = [...board] as Cell[];
@@ -57,10 +59,14 @@ export default function GameBoard() {
     // Bot move
     setIsLoadingBot(true);
     try {
-      const [{ position }] = await Promise.all([
-        api.getBotMove(newBoard, index, token),
+      const [botRes] = await Promise.all([
+        api.getBotMove(newBoard, index, token).catch((err: Error) => {
+          setBotError(err.message ?? 'บอทตอบสนองไม่ได้ กรุณาลองใหม่');
+          throw err;
+        }),
         new Promise((r) => setTimeout(r, 600)),
       ]);
+      const { position } = botRes;
       const botBoard = [...newBoard] as Cell[];
       botBoard[position] = 'O';
       const botMove = { player: 'O' as const, position, boardAfter: [...botBoard] };
@@ -83,6 +89,10 @@ export default function GameBoard() {
   }, [board, status, moves, token, isLoadingBot, addMove, setBoard, setStatus, setLastGameLogId, setIsLoadingBot]);
 
   return (
+    <div>
+      {botError && (
+        <p className="text-center text-red-400 text-sm mb-3">{botError}</p>
+      )}
     <div className="grid grid-cols-3 gap-2 w-72 mx-auto">
       {board.map((cell, i) => {
         const isWinCell = winLine?.includes(i);
@@ -102,6 +112,7 @@ export default function GameBoard() {
           </button>
         );
       })}
+    </div>
     </div>
   );
 }

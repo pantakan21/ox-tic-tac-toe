@@ -8,31 +8,38 @@ Human vs AI Tic-tac-toe with Google OAuth, score/streak tracking, leaderboard, a
 
 ## Quick Start
 
-ต้องมี **Docker Desktop** + **Node.js 20+** และไฟล์ `backend/.env` (ได้รับแยกต่างหาก)
+ต้องมี **Docker Desktop** และไฟล์ `backend/.env` (ได้รับแยกต่างหาก)
+
+### รัน Production (Docker ทั้งหมด)
 
 ```bash
 git clone <repo-url>
 cd ox-tic-tac-toe
 
-# 1. รัน MySQL + Redis ด้วย Docker
-docker compose up -d
-
-# 2. Backend (วาง .env ที่ได้รับใน backend/.env ก่อน)
-cd backend
-npm install
-npx prisma migrate deploy     # สร้างตาราง (ครั้งแรกเท่านั้น)
-npm run start:dev
-
-# 3. Frontend (เปิด terminal ใหม่)
-cd frontend
-npm install
-npm run dev
+# วาง .env ที่ได้รับใน backend/.env ก่อน แล้ว:
+docker compose up --build
 ```
 
 - เกม: http://localhost:3000
 - Swagger: http://localhost:3001/api/docs
 
-> Docker รันเฉพาะ MySQL + Redis ส่วนแอปรันด้วย npm เพื่อ dev ที่เร็วและ debug ง่าย
+### รัน Development (npm)
+
+ต้องมี **Node.js 20+** เพิ่มเติม
+
+```bash
+# 1. รัน MySQL + Redis
+docker compose up -d mysql redis
+
+# 2. Backend
+cd backend && npm install
+npx prisma migrate deploy
+npm run start:dev
+
+# 3. Frontend (เปิด terminal ใหม่)
+cd frontend && npm install
+npm run dev
+```
 
 ---
 
@@ -88,7 +95,8 @@ Modular Monolith: `auth/` `game/` `score/` `leaderboard/`
 - **Score** คำนวณฝั่ง server เท่านั้น + ตรวจ board state ก่อนบันทึก
 - **Streak** ใช้ Redis Lua script (atomic) ป้องกัน race condition
 - **AI Coach** เรียก Groq ฝั่ง server — API key ไม่ออกจาก backend
-- **Rate limit** 10 req/min บน `/game/end`
+- **Rate limit** 10 req/min บน `/game/end` (NestJS ThrottlerGuard)
+- **CSRF** — ไม่ต้องใช้ CSRF guard เพราะ auth ใช้ Bearer token ใน `Authorization` header (ไม่ใช้ cookie) ทำให้ CSRF attack ไม่ applicable โดย design
 
 > **Known trade-off:** server ตรวจ board เชิงโครงสร้าง แต่ยังไม่ replay `moves`
 > การปิดโกงสมบูรณ์ต้องทำ server-authoritative game state (เกินขอบเขต test นี้)

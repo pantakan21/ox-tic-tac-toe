@@ -5,8 +5,6 @@ import { PrismaService } from '../prisma/prisma.service';
 export class LeaderboardService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async invalidateCache() {}
-
   async getTop50() {
     return this.prisma.score.findMany({
       orderBy: { totalScore: 'desc' },

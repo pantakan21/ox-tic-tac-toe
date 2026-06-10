@@ -1,8 +1,3 @@
-version: "3.9"
-
-# รัน infrastructure (MySQL + Redis) สำหรับ local development
-# แอป (backend/frontend) รันด้วย npm — ดู README
-
 services:
   mysql:
     image: mysql:8.0
@@ -34,6 +29,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  backend:
+    build: ./backend
+    container_name: ox_backend
+    ports:
+      - "3001:3001"
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: mysql://ox_user:ox_password@mysql:3306/ox_game
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: ox_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:
