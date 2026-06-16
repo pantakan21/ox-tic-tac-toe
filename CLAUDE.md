@@ -68,7 +68,8 @@
 - **Redis** — เก็บ streak counter (atomic Lua script)
 
 ### Infrastructure
-- **Docker Compose** — รัน app + mysql + redis ด้วย command เดียว
+- **Docker Compose** — รัน MySQL + Redis ด้วย command เดียว (infra เท่านั้น)
+- **Frontend/Backend** — รัน local ด้วย `npm run dev` ชี้ไปที่ MySQL/Redis ที่ expose port จาก container (มี `Dockerfile` แยกในแต่ละโฟลเดอร์เผื่อ build image สำหรับ deploy จริง แต่ยังไม่ผูกเข้า `docker-compose.yml`)
 - **npm** package manager
 
 ---
